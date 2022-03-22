@@ -57,12 +57,61 @@ fsl_d:
 	jmp fsl	# return to main loop
 
  
-fsl_c: 	nop
-fsl_s:	nop
+fsl_c:
+	pop %rcx		# get stack pointer adder counter
+	inc %rcx		# get next index in stack
+	mov (%rsp, %rcx, 8), %rbx	# mov the value to %rbx
+	push %rcx
+
+	mov $12, %rax
+	xor %rdi, %rdi
+	syscall
+	push %rax	# save heap to free memory later
+	mov %rax, %rdi
+	inc %rdi
+	mov $12, %rax
+	syscall
+
+	mov %rbx, (%rdi)
+	mov $1, %rax
+	mov %rdi, %rsi
+	mov $1, %rdi
+	mov $1, %rdx
+	syscall
+	
+	mov $12, %rax
+	pop %rdi
+	syscall
+	add $1, %r8
+	jmp fsl
+
+fsl_s:
+	pop %rcx		# get stack pointer adder counter
+	inc %rcx		# get next index in stack
+	mov (%rsp, %rcx, 8), %rbx	# mov the value to %rbx
+	push %rcx
+
+	# print all chars in string until \0
+fss:xor %rcx, %rcx
+	mov (%rbx), %cl
+	cmp $0, %rcx
+	je fso
+
+	mov $1, %rax
+	mov $1, %rdi
+	mov %rbx, %rsi
+	mov $1, %rdx
+	syscall
+	inc %rbx
+	jmp fss
+
+fso:
+	add $1, %r8
+	jmp fsl
 
 fsl_o:
 	# return from the procedure
-	pop %rcx
+	pop %rcx	# pop variable counter
 	ret
 
 	# print decimals (recursive)

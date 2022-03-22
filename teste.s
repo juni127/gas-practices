@@ -3,13 +3,14 @@
 .extern printf
 
 .data
-hello: .ascii "The first number is %d the second is %d and I'm glad this works!\n\0"
+name:  .ascii "Github\0"
+hello: .ascii "Hello, %s, I guess you're my %d friend now!\n\0"
 
 .text
 _start:
-	mov $3999, %rax
+	mov $2, %rax
 	push %rax
-	mov $123547, %rax
+	mov $name, %rax
 	push %rax
 	mov $hello, %rax
 	push %rax
